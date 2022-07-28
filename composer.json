@@ -1,0 +1,51 @@
+{
+    "name": "simon-ugorji/octavalidate-php",
+    "description": "This Library helps to validate your forms server-side using sophisticated regular expressions and validation rules.",
+    "type": "library",
+    "keywords": [
+        "forms",
+        "form-validator",
+        "html",
+        "regexp",
+        "validation-library",
+        "file-validator",
+        "length-validator"
+    ],
+    "homepage": "https://octagon-simon.github.io/octavalidate/php/index.html",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simon Ugorji",
+            "email": "ugorji757@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.40"
+    },
+    "support": {
+        "email": "ugorji757@gmail.com",
+        "issues": "https://github.com/Octagon-simon/octaValidate-PHP/issues"
+    },
+    "funding": [
+        {
+            "type": "other",
+            "url": "https://www.paypal.com/donate/?hosted_button_id=ZYK9PQ8UFRTA4"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Validate\\": "src/"
+        },
+        "files": [
+            "src/Validate.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Validate\\octaValidateServiceProvider"
+            ]
+        }
+    }
+}
