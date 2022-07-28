@@ -359,6 +359,10 @@ const myForm = new octaValidate('FORM_ID');
 
 - Open any file within the demo folder and submit the form or visit the [documentation](https://octagon-simon.github.io/projects/octavalidate/php/) and submit the forms there.
 
+## PHP VERSION
+
+It supports PHP Version from 5.6.40 to the latest.
+
 ## Author
 
 [Simon Ugorji](https://twitter.com/ugorji_simon)
