@@ -1,8 +1,8 @@
-# <img align="center" src="https://octagon-simon.github.io/octaValidate/img/ov-success.png" width="25px"> octaValidate-PHP V1.0
+# <img align="center" src="https://octagon-simon.github.io/octaValidate/img/ov-success.png" width="25px"> octaValidate-PHP V1.1
 
-This library helps to validate your forms server-side using validation rules and sophisticated regular expressions.
+This is a feature-rich Library that helps to validate your forms server-side using sophisticated regular expressions, PHP's inbuilt validation, and validation rules.
 
-We have included a demo folder containing some forms with validation rules applied to each of them. Open any of the files in this folder in your browser and try to submit the form.
+We have included a demo folder containing some forms with validation rules applied to each of them. Open any of the files in your local server and submit the form.
 
 This Library also helps to validate your frontend forms using JavaScript. [Visit the repository](https://github.com/Octagon-simon/octaValidate)
 
@@ -14,7 +14,7 @@ Visit the [DOCUMENTATION](https://octagon-simon.github.io/projects/octavalidate/
 
 ### COMPOSER
 
-```shell
+```
 $ composer require simon-ugorji/octavalidate-php
 ```
 
@@ -29,12 +29,10 @@ require 'src/Validate.php';
 
 use Validate\octaValidate;
 
-$myForm = new octaValidate('FORM_ID');
+$myForm = new octaValidate('FORM_ID', 'CONFIG_OPTIONS');
 ```
 
 ## How to Use
-
-- Create a new instance of the class **octavalidate**, and pass in the **form ID** as the *first argument*, then any **configuration** as the *second argument*.
 
 - Define validation rules for the form inputs
 - Invoke the `validate()` method and pass in the rules as an argument.
@@ -46,7 +44,7 @@ require 'src/Validate.php';
 use Validate\octaValidate;
 
 //create new instance
-$myForm = new octaValidate('FORM_ID');
+$myForm = new octaValidate('FORM_ID', 'CONFIG_OPTIONS');
 
 //syntax for defining validation rules
 $valRules = array(
@@ -79,8 +77,8 @@ if ($myForm->validate($valRules) === true){
 ```
 The validate method returns a `boolean`.
 
-- true means there are no validation errors
-- false means there are validation errors
+- `true` means there are no validation errors
+- `false` means there are validation errors
 
 > Make sure that all input elements have a **unique name**.
 
@@ -153,7 +151,8 @@ $RULES = array(
 );
 $myForm->moreCustomRules($RULES);
 ```
-Here's a sample rule username & password rules
+Here's a sample custom username & password validation rule
+
 ```php
 //require the library
 require 'src/Validate.php';
@@ -206,8 +205,6 @@ $valRules = array(
 
 You can check the number of characters provided by the user using this validation.
 
-So we have;
-
 - maxlength (5) - This means that value must be 5 characters or less.
 - minlength (5) - This means that value must be up to 5 characters or more.
 - length (5) - This means that value must be equal to 5 characters.
@@ -229,7 +226,7 @@ $valRules = array(
 ```
 ### EQUALTO VALIDATION
 
-You can check if two inputs contain the same values, using the attribute **equalto** on the input name, with a value containing the name of the other input element to check against.
+You can check if two inputs contain the same values using the rule **EQUALTO**. The value of this validation rule must be the other **input name** you wish to check against.
 
 ```php
 //sample validation
@@ -242,17 +239,19 @@ $valRules = array(
 ```
 ### FILE VALIDATION
 
-You can validate: **accept, accept-mime, size, minsize, maxsize** for an uploaded file or multiple uploaded files.
+Within File validation, we have rules such as;
 
-- ACCEPT - Use this attribute to list out the file extensions allowed for upload
-- ACCEPT-MIME - Use this attribute to list out the file MIME types allowed for upload. It supports a wildcard eg audio/*
-- SIZE (2mb) - This means that the file or files provided must be 2mb in size
-- MINSIZE (5mb) - This means that the file or files provided must be up to 5mb or more.
-- MAXSIZE (5mb) - This means that the file or files provided must be 5mb or less.
+- ACCEPT - Use this rule to list out the file extensions allowed for upload. Eg. .png, .jpeg.
+- ACCEPT-MIME - Use this rule to list out the file MIME types allowed for upload. It supports a wildcard. Eg audio/*, image/*
+- SIZE - This rule makes sure that the size of the file or files provided must be equal to the specified value.
+- MINSIZE - This rule makes sure that the size of the file or files provided must be up to the specified value or more.
+- MAXSIZE  - This rule makes sure that the size of the file or files provided must be the specified value or less.
+- FILES, MINFILES, MAXFILES
 
-> Note that **size, minsize & maxsize** works on single or multiple file upload.
+> Note that **size, minsize & maxsize** works on both single or multiple file upload.
 
 For example;
+
 ```php
 //sample validation
 $formRules = array(
@@ -271,13 +270,13 @@ $formRules = array(
     )
 );
 ```
-Please refer to the [documentation](https://octagon-simon.github.io/projects/octavalidate/php/file.html) to learn more about validating a file input.
+Please refer to the [documentation](https://octagon-simon.github.io/projects/octavalidate/php/file.html) to learn more file validation rules.
 
 ## API METHODS
 
 ### STATUS
 
-You can invoke the **getStatus()** method anytime to check the number of validation errors on the form.
+Invoke the **getStatus()** method to return the number of validation errors on the form.
 
 ```php
 //require the library
@@ -309,7 +308,7 @@ We have 3 configuration options:
 
 To use any of these options, provide it as an array and pass it as the second argument when creating an instance of octaValidate.
 
-```javascript
+```php
 //require the library
 require 'src/Validate.php';
 
@@ -328,9 +327,9 @@ $myForm = new octaValidate('FORM_ID', $options);
 ## REFERENCE METHODS
 After creating a new instance of the function, the methods below becomes available for use.
 
-```javascript
+```php
 //create instance of the function
-const myForm = new octaValidate('FORM_ID');
+$myForm = new octaValidate('FORM_ID');
 ```
 
 - **validate()**
@@ -358,10 +357,6 @@ const myForm = new octaValidate('FORM_ID');
 ## DEMO
 
 - Open any file within the demo folder and submit the form or visit the [documentation](https://octagon-simon.github.io/projects/octavalidate/php/) and submit the forms there.
-
-## PHP VERSION
-
-It supports PHP Version from 5.6.40 to the latest.
 
 ## Author
 

@@ -2,9 +2,9 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V1.0
+ * OctaValidate Main PHP V1.1
  * author: Simon Ugorji
- * Last Edit : 27th July 2022
+ * Last Edit : 10th August 2022
  */
 
 //include rules library
@@ -14,7 +14,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '1.0';
+    private static $version = '1.1';
     //author
     private static $author = 'Simon Ugorji';
     //form id
@@ -240,7 +240,7 @@ class octaValidate
                     else if (self::$continueValidation && $rt === "EMAIL" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "This Email Address is Invalid";
-                        if (Validate_Email($inputValue) === false) {
+                        if (filter_var($inputValue, FILTER_VALIDATE_EMAIL) === false) {
                             self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
                         }
@@ -336,7 +336,7 @@ class octaValidate
                     else if (self::$continueValidation && $rt === "URL" && $inputValue) {
                         //error message
                         $errMsg = "Please provide a valid URL that begins with http or https!";
-                        if (Validate_Url($inputValue) === false) {
+                        if (filter_var($inputValue, FILTER_VALIDATE_URL) === false) {
                             self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
                         }
