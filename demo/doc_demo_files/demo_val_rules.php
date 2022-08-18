@@ -1,4 +1,8 @@
 <?php
+/**
+ *These are the server-side scripts used on the documentation page
+ **/
+
 //require the library
 require 'octavalidate-php/validate.php';
 //set configuration
@@ -27,6 +31,6 @@ if ($myForm->validate($valRules) === true){
 }else{
   //return errors
   http_response_code(400);
-  print_r($myForm->getErrors());
+  print_r(json_encode($myForm->getErrors()));
 }
 ?>

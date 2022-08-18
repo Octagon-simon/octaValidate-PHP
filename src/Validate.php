@@ -2,9 +2,9 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V1.1
+ * OctaValidate Main PHP V1.2
  * author: Simon Ugorji
- * Last Edit : 10th August 2022
+ * Last Edit : 16th August 2022
  */
 
 //include rules library
@@ -14,7 +14,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '1.1';
+    private static $version = '1.2';
     //author
     private static $author = 'Simon Ugorji';
     //form id
@@ -790,7 +790,7 @@ class octaValidate
         $retval = array(
             self::$form => self::$errors
         );
-        return (json_encode($retval));
+        return ($retval);
     }
     //return error count
     public static function getStatus()

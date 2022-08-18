@@ -47,7 +47,7 @@ if ($_POST) {
         //retrieve & display errors
         print('<script>
             window.addEventListener(\'load\', function(){
-                showErrors(' . $DemoForm->getErrors() . ');
+                showErrors(' . json_encode($DemoForm->getErrors()) . ');
             })
         </script>');    
     }

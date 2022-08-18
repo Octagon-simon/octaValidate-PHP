@@ -1,4 +1,9 @@
 <?php
+
+/**
+ *These are the server-side scripts used on the documentation page
+ **/
+
 //require the library
 require 'octavalidate-php/validate.php';
 //set configuration
@@ -18,22 +23,23 @@ $myForm->customRule($rule_title, $reg_exp, $err_txt);
 
 //define rules for each form input name
 $valRules = array(
-    "password" => array(
-      ["R", "Your password is required"],
-      ["PASS"]
+  "password" => array(
+    ["R", "Your password is required"],
+    ["PASS"]
   )
 );
 //begin validation
-if ($myForm->validate($valRules) === true){
+if ($myForm->validate($valRules) === true) {
   //process form data here
   http_response_code(200);
-  $retval= array(
-      "success" => true
+  $retval = array(
+    "success" => true
   );
   print_r(json_encode($retval));
-}else{
+}
+else {
   //return errors
   http_response_code(400);
-  print_r($myForm->getErrors());
+  print_r(json_encode($myForm->getErrors()));
 }
 ?>

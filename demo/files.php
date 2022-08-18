@@ -31,7 +31,7 @@ if (isset($_FILES['file'])) {
         //retrieve & display errors
         print('<script>
             window.addEventListener(\'load\', function(){
-                showErrors(' . $validate->getErrors() . ');
+                showErrors(' . json_encode($validate->getErrors()) . ');
             })
         </script>');
     }

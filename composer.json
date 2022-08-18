@@ -1,6 +1,6 @@
 {
     "name": "simon-ugorji/octavalidate-php",
-    "description": "This is a feature-rich Library that helps to validate your forms server-side using sophisticated regular expressions, PHP's inbuilt validation, and validation rules.",
+    "description": "This is a feature-rich form validation Library that helps to validate your forms server-side using sophisticated regular expressions, PHP's inbuilt validation, and validation rules.",
     "type": "library",
     "keywords": [
         "forms",

@@ -70,9 +70,10 @@ function showErrors(errorsObj) {
     };
     if (typeof errorsObj == "undefined" || !isObject(errorsObj) || Object.keys(errorsObj).length === 0)
         throw new Error(
-            "A Valid Object must be passed as an argument to the [showBackendErrors] method if you want to display server-side Form Errors.")
+            "A Valid Object must be passed as an argument to the [showErrors] function if you want to display server-side Form Errors.")
     //assign form id
     const form_id = Object.keys(errorsObj)[0];
+    
     if (!findElem(form_id))
         throw new Error(`A form with this id [${form_id}] does not Exist`)
 
