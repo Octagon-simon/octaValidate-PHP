@@ -2,9 +2,9 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V1.2
+ * OctaValidate Main PHP V1.3
  * author: Simon Ugorji
- * Last Edit : 16th August 2022
+ * Last Edit : 26th August 2022
  */
 
 //include rules library
@@ -14,7 +14,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '1.2';
+    private static $version = '1.3';
     //author
     private static $author = 'Simon Ugorji';
     //form id
@@ -474,11 +474,12 @@ class octaValidate
                     throw new \InvalidArgumentException("The validate method needs a valid Array to begin File validation");
                 //loop through validations
                 foreach ($userValidations[$inputName] as $valData) {
+                    //added break keyword to prevent the loop from checking the next file if current file contains errors
                     //validation rule
                     $rt = $valData[0];
                     //handle multiple file upload
                     if (is_array($fileData['name'])) {
-                        //loop through files
+                        //loop through all files
                         $currentFileInd = 0;
                         while ($currentFileInd < count($fileData['name'])) {
                             //-------------------
@@ -494,15 +495,11 @@ class octaValidate
                                 //error message
                                 $errMsg = (!empty($valData[1])) ? $valData[1] : "A valid file is required";
                                 if (empty($currentFileName) || empty($currentFileType) || empty($currentFileSize)) {
-                                    self::$continueValidation = 0;
                                     self::ovNewMultiFileError($inputName, $errMsg);
-                                }
-                                else {
-                                    self::$continueValidation++;
-                                    self::ovRemoveMultiFileError($inputName);
+                                    break;
                                 }
                             }
-                            else if (self::$continueValidation && $rt === "ACCEPT" && $currentFileName) {
+                            else if ($rt === "ACCEPT" && $currentFileName) {
                                 //attribute value
                                 $requiredExts = (!empty($valData[1])) ? explode(",", str_replace(" ", "", $valData[1])) : self::ovDoException("The file extensions to check must be provided after the \"ACCEPT\" rule");
                                 //error message
@@ -519,35 +516,26 @@ class octaValidate
                                 //preg_match('#.\/\*{1}#', $rext) [image/*]
 
                                 if (!in_array($currentExt, $requiredExts)) {
-                                    self::$continueValidation = 0;
                                     self::ovNewMultiFileError($inputName, $errMsg);
-
-                                }
-                                else {
-                                    self::$continueValidation++;
-                                    self::ovRemoveMultiFileError($inputName);
+                                    break;
                                 }
                             }
-                            else if (self::$continueValidation && $rt === "ACCEPT-MIME" && $currentFileName) {
+                            else if ($rt === "ACCEPT-MIME" && $currentFileName) {
                                 //attribute value
                                 $requiredMime = (!empty($valData[1])) ? explode(",", str_replace(" ", "", $valData[1])) : self::ovDoException("The MIME types to check must be provided after the \"ACCEPT-MIME\" rule");
                                 //error message
                                 $errMsg = (!empty($valData[2])) ? $valData[2] : 'This file ' . $currentFileName . ' is not supported';
                                 //check if current type is contained within array
                                 if (!in_array(explode(substr($currentFileType, strrpos($currentFileType, "/")), $currentFileType)[0] . "/*", $requiredMime) && !in_array($currentFileType, $requiredMime)) {
-                                    self::$continueValidation = 0;
                                     self::ovNewMultiFileError($inputName, $errMsg);
-                                }
-                                else {
-                                    self::$continueValidation++;
-                                    self::ovRemoveMultiFileError($inputName);
+                                    break;
                                 }
                             }
 
                             //check for next file
                             $currentFileInd++;
                         }
-                        //handle size validation instead of using total, use size
+                        //the section below is removed from the loop because it needs to work on all files at once not each of them
                         if ($rt === "SIZE") {
                             //attribute value
                             $fileSize = (!empty($valData[1])) ? strtolower($valData[1]) : self::ovDoException('A valid file size must be provided after the "SIZE" rule');
@@ -559,15 +547,11 @@ class octaValidate
                                 $totalSize += $fds;
                             }
                             if (self::getSizeInBytes($fileSize) !== $totalSize) {
-                                self::$continueValidation = 0;
                                 self::ovNewMultiFileError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveMultiFileError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "MINSIZE") {
+                        else if ($rt === "MINSIZE") {
                             //attribute value
                             $fileSize = (!empty($valData[1])) ? strtolower($valData[1]) : self::ovDoException('A valid file size must be provided after the "MINSIZE" rule');
                             //error message
@@ -578,15 +562,11 @@ class octaValidate
                                 $totalSize += $fds;
                             }
                             if (!($totalSize >= self::getSizeInBytes($fileSize))) {
-                                self::$continueValidation = 0;
                                 self::ovNewMultiFileError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveMultiFileError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "MAXSIZE") {
+                        else if ($rt === "MAXSIZE") {
                             //attribute value
                             $fileSize = (!empty($valData[1])) ? strtolower($valData[1]) : self::ovDoException('A valid file size must be provided after the "MAXSIZE" rule');
                             //error message
@@ -598,15 +578,11 @@ class octaValidate
                             }
                             //do total files, totalmaxfiles
                             if (!($totalSize <= self::getSizeInBytes($fileSize))) {
-                                self::$continueValidation = 0;
                                 self::ovNewMultiFileError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveMultiFileError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "FILES") {
+                        else if ($rt === "FILES") {
                             //attribute value
                             $filesNum = (!empty($valData[1])) ? intval($valData[1]) : self::ovDoException('You must provide the number of files after the "FILES" rule');
                             //error message
@@ -621,15 +597,11 @@ class octaValidate
                             }
                             //do total files, totalmaxfiles
                             if ($totalFiles != $filesNum) {
-                                self::$continueValidation = 0;
                                 self::ovNewMultiFileError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveMultiFileError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "MINFILES") {
+                        else if ($rt === "MINFILES") {
                             //attribute value
                             $filesNum = (!empty($valData[1])) ? intval($valData[1]) : self::ovDoException('You must provide the number of files after the "MINFILES" rule');
                             //error message
@@ -644,15 +616,11 @@ class octaValidate
                             }
                             //do total files, totalmaxfiles
                             if (!($totalFiles >= $filesNum)) {
-                                self::$continueValidation = 0;
                                 self::ovNewMultiFileError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveMultiFileError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "MAXFILES") {
+                        else if ($rt === "MAXFILES") {
                             //attribute value
                             $filesNum = (!empty($valData[1])) ? intval($valData[1]) : self::ovDoException('You must provide the number of files after the "FILES" rule');
                             //error message
@@ -667,12 +635,8 @@ class octaValidate
                             }
                             //do total files, totalmaxfiles
                             if (!($totalFiles <= $filesNum)) {
-                                self::$continueValidation = 0;
                                 self::ovNewMultiFileError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveMultiFileError($inputName);
+                                break;
                             }
                         }
                     }
@@ -682,15 +646,11 @@ class octaValidate
                             //error message
                             $errMsg = (!empty($valData[1])) ? $valData[1] : "A valid file is required";
                             if (empty($fileData['name']) || empty($fileData['type']) || empty($fileData['size'])) {
-                                self::$continueValidation = 0;
                                 self::ovNewError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "ACCEPT" && $fileData['name']) {
+                        else if ($rt === "ACCEPT" && $fileData['name']) {
                             //attribute value
                             $requiredExts = (!empty($valData[1])) ? explode(",", str_replace(" ", "", $valData[1])) : self::ovDoException("The file extensions / MIME types to check must be provided after the \"ACCEPT\" rule");
                             //error message
@@ -700,30 +660,22 @@ class octaValidate
                             //------------------
 
                             if (!in_array($currentExt, $requiredExts)) {
-                                self::$continueValidation = 0;
                                 self::ovNewError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "ACCEPT-MIME" && $fileData['name']) {
+                        else if ($rt === "ACCEPT-MIME" && $fileData['name']) {
                             //attribute value
                             $requiredMime = (!empty($valData[1])) ? explode(",", str_replace(" ", "", $valData[1])) : self::ovDoException("The MIME types to check must be provided after the \"ACCEPT-MIME\" rule");
                             //error message
                             $errMsg = (!empty($valData[2])) ? $valData[2] : 'This file ' . $fileData['name'] . ' is not supported';
                             //check if current type is contained within array
                             if (!in_array(explode(substr($fileData['type'], strrpos($fileData['type'], "/")), $fileData['type'])[0] . "/*", $requiredMime) && !in_array($fileData['type'], $requiredMime)) {
-                                self::$continueValidation = 0;
                                 self::ovNewError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "SIZE" && $fileData['name']) {
+                        else if ($rt === "SIZE" && $fileData['name']) {
                             //attribute value
                             $fileSize = (!empty($valData[1])) ? strtolower($valData[1]) : self::ovDoException('A valid file size must be provided after the "SIZE" rule');
                             //error message
@@ -732,16 +684,11 @@ class octaValidate
                             $currentFileSize = $fileData['size'];
 
                             if (self::getSizeInBytes($fileSize) !== $currentFileSize) {
-                                echo "error here0";
-                                self::$continueValidation = 0;
                                 self::ovNewError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "MINSIZE" && $fileData['name']) {
+                        else if ($rt === "MINSIZE" && $fileData['name']) {
                             //attribute value
                             $fileSize = (!empty($valData[1])) ? strtolower($valData[1]) : self::ovDoException('A valid file size must be provided after the "MINSIZE" rule');
                             //error message
@@ -750,15 +697,11 @@ class octaValidate
                             $currentFileSize = $fileData['size'];
 
                             if (!($currentFileSize >= self::getSizeInBytes($fileSize))) {
-                                self::$continueValidation = 0;
                                 self::ovNewError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveError($inputName);
+                                break;
                             }
                         }
-                        else if (self::$continueValidation && $rt === "MAXSIZE" && $fileData['name']) {
+                        else if ($rt === "MAXSIZE" && $fileData['name']) {
                             //attribute value
                             $fileSize = (!empty($valData[1])) ? strtolower($valData[1]) : self::ovDoException('A valid file size must be provided after the "MINSIZE" rule');
                             //error message
@@ -766,12 +709,8 @@ class octaValidate
                             //get current file size
                             $currentFileSize = $fileData['size'];
                             if (!($currentFileSize <= self::getSizeInBytes($fileSize))) {
-                                self::$continueValidation = 0;
                                 self::ovNewError($inputName, $errMsg);
-                            }
-                            else {
-                                self::$continueValidation++;
-                                self::ovRemoveError($inputName);
+                                break;
                             }
                         }
                     }
