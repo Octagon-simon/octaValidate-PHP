@@ -2,7 +2,7 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V1.3
+ * OctaValidate Main PHP V1.4
  * author: Simon Ugorji
  * Last Edit : 26th August 2022
  */
@@ -14,7 +14,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '1.3';
+    private static $version = '1.4';
     //author
     private static $author = 'Simon Ugorji';
     //form id

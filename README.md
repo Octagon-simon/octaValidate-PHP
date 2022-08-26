@@ -1,4 +1,4 @@
-# <img align="center" src="https://octagon-simon.github.io/assets/img/octavalidate-php.png" width="25px"> octaValidate-PHP V1.3
+# <img align="center" src="https://octagon-simon.github.io/assets/img/octavalidate-php.png" width="25px"> octaValidate-PHP V1.4
 
 This is a feature-rich Library that helps to validate your forms server-side using sophisticated regular expressions, PHP's inbuilt validation, and validation rules.
 
