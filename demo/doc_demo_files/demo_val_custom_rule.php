@@ -29,7 +29,7 @@ $valRules = array(
   )
 );
 //begin validation
-if ($myForm->validate($valRules) === true) {
+if ($myForm->validateFields($_POST, $valRules) === true) {
   //process form data here
   http_response_code(200);
   $retval = array(

@@ -21,7 +21,7 @@ $valRules = array(
     )
   );
 //begin validation
-if ($myForm->validate($valRules) === true){
+if ($myForm->validateFiles($valRules) === true){
   //process form data here
   http_response_code(200);
   $retval= array(

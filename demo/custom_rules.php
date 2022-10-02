@@ -1,6 +1,6 @@
 <?php
 //require library
-require '../src/v1.6.php';
+require '../src/Validate.php';
 
 use Validate\octaValidate;
 
@@ -34,7 +34,7 @@ if (isset($_POST['uname'])) {
     );
 
     //validate form
-    if ( $validate->validate($formRules) ) {
+    if ( $validate->validateFields($_POST, $formRules) ) {
         echo "FORM SUBMITTED";
     }
     else {

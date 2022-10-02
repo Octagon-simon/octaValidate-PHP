@@ -22,7 +22,7 @@ if (isset($_POST['test'])) {
     );
 
     //validate form
-    if ( $validate->validate($formRules) ) {
+    if ( $validate->validateFields($_POST, $formRules) ) {
         var_dump("Submitted value = ".$_POST['test']);
         echo "FORM SUBMITTED";
     }

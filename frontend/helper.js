@@ -89,6 +89,8 @@ function showErrors(errorsObj) {
                 inputName.split(':').forEach(inp => {
                     //loop through all form inputs
                     document.querySelectorAll('#' + form_id + ' [name]').forEach(ie => {
+                        //ie -> input element from the form
+                        //inp -> input element of form from error object
                         if (ie.name === inp) {
                             //remove success class
                             ie.classList.remove('octavalidate-inp-success');
@@ -107,8 +109,31 @@ function showErrors(errorsObj) {
                             }
                             g.setAttribute("class", "octavalidate-txt-error");
                             g.innerText = errorText;
-                            //insert after
+                            //insert error text after the input element
                             ie.after(g);
+                            //maybe frontend inputElement.watch() to validate in frontend again
+                            //Listen to change in input value, then remove the error
+                            if (ie.addEventListener) {
+                                ie.addEventListener("change", function(){
+                                    if(this.value.trim() !== ""){
+                                        this.classList.remove("octavalidate-inp-error");
+                                        //if error text element exists
+                                        if(g){
+                                            g.remove()
+                                        }
+                                    }
+                                }, { once: true });
+                            } else if (elem.attachEvent) {
+                                ie.attachEvent("change", function(){
+                                    if(this.value.trim() !== ""){
+                                        this.classList.remove("octavalidate-inp-error");
+                                        //if error text element exists
+                                        if(g){
+                                            g.remove()
+                                        }
+                                    }
+                                });
+                            }
                         }
                     });
                 })
@@ -133,6 +158,28 @@ function showErrors(errorsObj) {
                         g.innerText = errorText;
                         //insert after
                         ie.after(g);
+                        //Listen to change in input value, then remove the error
+                        if (ie.addEventListener) {
+                            ie.addEventListener("change", function(){
+                                if(this.value.trim() !== ""){
+                                    this.classList.remove("octavalidate-inp-error");
+                                    //if error text element exists
+                                    if(g){
+                                        g.remove()
+                                    }
+                                }
+                            }, { once: true });
+                        } else if (elem.attachEvent) {
+                            ie.attachEvent("change", function(){
+                                if(this.value.trim() !== ""){
+                                    this.classList.remove("octavalidate-inp-error");
+                                    //if error text element exists
+                                    if(g){
+                                        g.remove()
+                                    }
+                                }
+                            });
+                        }
                     }
                 });
             }

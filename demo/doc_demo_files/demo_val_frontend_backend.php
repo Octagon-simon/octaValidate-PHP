@@ -31,7 +31,7 @@ $valRules = array(
         ["EQUALTO", "confirm_password", "Both passwords do not match"]    
 ));
 //begin validation
-if ($myForm->validate($valRules) === true) {
+if ($myForm->validateFields($_POST, $valRules) === true) {
     http_response_code(200);
     $retval = array(
         "success" => true

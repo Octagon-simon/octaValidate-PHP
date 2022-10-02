@@ -24,7 +24,7 @@ if (isset($_FILES['file'])) {
     );
 
     //validate form
-    if ( $validate->validate($formRules) ) {
+    if ( $validate->validateFiles($formRules) ) {
         echo "FORM SUBMITTED";
     }
     else {

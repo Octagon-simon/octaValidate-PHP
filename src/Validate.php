@@ -2,11 +2,10 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V1.6
+ * OctaValidate Main PHP V2.0
  * author: Simon Ugorji
  * Last Edit : 2nd October 2022
  */
-
 
 //include rules library
 require('RulesLib.php');
@@ -15,7 +14,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '1.6';
+    private static $version = '2.0';
     //author
     private static $author = 'Simon Ugorji';
     //form id
@@ -153,10 +152,10 @@ class octaValidate
         }
     }
 
-    private static function doStrictMode()
+    private static function doStrictMode(array $fields = [])
     {
         $configOptions = self::$configOptions;
-        foreach ($_POST as $inp => $val) {
+        foreach ($fields as $inp => $val) {
             //check and strip tags if enabled
             if ($configOptions["stripTags"]) {
                 //reassign local variable
@@ -169,66 +168,68 @@ class octaValidate
                 $val = trim($val);
             }
             //reassign value
-            $_POST[$inp] = $val;
+            $fields[$inp] = $val;
+            //check if it exists in post array or get array
+            if (isset($_POST[$inp])) {
+                $_POST[$inp] = $val;
+            }
+            else if (isset($_GET[$inp])) {
+                $_GET[$inp] = $val;
+            }
         }
     }
-
-    /**
-     * @deprecated
-     *
-     * @return Boolean
-     */
-    public static function validate($userValidations)
+    public static function validateFields(array $fields = [], array $valRules = [])
     {
-        trigger_error('The Method '. __METHOD__.' is deprecated and will be removed & replaced in future versions of this library', E_USER_DEPRECATED);
+        if (!is_array($fields) || !count($fields))
+            //The fields to validate must be a non-empty array
+            throw new \InvalidArgumentException("Fieldlist is empty");
 
-        if (!is_array($userValidations))
-            throw new \InvalidArgumentException("The validate method needs a valid Array to begin validation");
+        if (!is_array($valRules) || !count($valRules))
+            throw new \InvalidArgumentException("Your validation rules must be a non-empty array");
         //load custom rules
         $customRules = self::$customRules;
         //config optio s
         $configOptions = self::$configOptions;
         //handle strict mode
-        self::doStrictMode();
-        //loop through POST DATA
-        foreach ($_POST as $inputName => $inputValue) {
-            //check for strict words
-            if ($configOptions["strictMode"] && $configOptions["strictWords"]) {
-                $res = array_filter(self::$configOptions["strictWords"],
-                    function ($word) use ($inputValue) {
-                    return (preg_match('/(' . $word . ')/', $inputValue));
-                });
-                $errMsg = "Please replace or remove ";
-                foreach ($res as $i => $word) {
-                    if ($i !== (count($res) - 1))
-                        //add comma after the word
-                        $errMsg .= $word . ', ';
+        self::doStrictMode($fields);
 
-                    $errMsg .= $word;
-                //example output is please remove or replace null, admin, empty
-                }
-                if (count($res) !== 0) {
-                    self::$continueValidation = 0;
-                    self::ovNewError($inputName, $errMsg);
-                }
-                else {
-                    self::$continueValidation++;
-                    self::ovRemoveError($inputName);
-                }
-            }
-            else {
-                self::$continueValidation++;
-                self::ovRemoveError($inputName);
-            }
-            //check if current input has a validation
-            if (self::$continueValidation && !empty($userValidations[$inputName])) {
-                //check if an array was provided
-                if (!is_array($userValidations[$inputName]))
-                    throw new \InvalidArgumentException("The validate method needs a valid Array to begin validation");
-                //loop through validations
-                foreach ($userValidations[$inputName] as $valData) {
+        //loop through valrules and check if input name is in fields array
+        foreach ($valRules as $inputName => $rules) {
+            if (!isset($fields[$inputName]))
+                self::ovNewError($inputName, "Fieldname $inputName cannot be found");
+        }
+        //loop through fields
+        foreach ($fields as $inputName => $inputValue) {
+            //check if input name needs to be validated
+            if (isset($valRules[$inputName])) {
+                //loop through validation data [ [R, ...], [UNAME, ...] ] for an input name
+                foreach ($valRules[$inputName] as $valData) {
                     //validation rule
                     $rt = $valData[0];
+                    //check if an array was provided
+                    if (!is_array($valData))
+                        throw new \InvalidArgumentException("The validation rules for $inputName must be an array");
+                    //check for strict mode
+                    if ($configOptions["strictMode"] && $configOptions["strictWords"]) {
+                        $res = array_filter(self::$configOptions["strictWords"],
+                            function ($word) use ($inputValue) {
+                            return (preg_match('/(' . $word . ')/', $inputValue));
+                        });
+                        $errMsg = "Please replace or remove ";
+                        foreach ($res as $i => $word) {
+                            if ($i !== (count($res) - 1))
+                                //add comma after the word
+                                $errMsg .= $word . ', ';
+
+                            $errMsg .= $word;
+                        //example output is please remove or replace null, admin, empty
+                        }
+
+                        if (count($res) !== 0) {
+                            self::ovNewError($inputName, $errMsg);
+                            break;
+                        }
+                    }
                     //do required
                     if ($rt === "R") {
                         //error message
@@ -242,177 +243,121 @@ class octaValidate
                             self::ovRemoveError($inputName);
                         }
                     }
-                    else if (self::$continueValidation && count($customRules) !== 0 && !empty($customRules[$rt]) && $inputValue) {
+                    else if (count($customRules) !== 0 && !empty($customRules[$rt]) && $inputValue) {
                         $pattern = $customRules[$rt][0];
                         $errMsg = $customRules[$rt][1];
                         if (!preg_match($pattern, $inputValue)) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "EMAIL" && $inputValue) {
+                    else if ($rt === "EMAIL" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "This Email Address is Invalid";
                         if (filter_var($inputValue, FILTER_VALIDATE_EMAIL) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "ALPHA_ONLY" && $inputValue) {
+                    else if ($rt === "ALPHA_ONLY" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Please enter only Letters";
                         if (Validate_ALPHA_ONLY($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "ALPHA_SPACES" && $inputValue) {
+                    else if ($rt === "ALPHA_SPACES" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Only letters or spaces is allowed";
                         if (Validate_ALPHA_SPACES($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "ALPHA_NUMERIC" && $inputValue) {
+                    else if ($rt === "ALPHA_NUMERIC" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Only letters or numbers is allowed";
                         if (Validate_ALPHA_NUMERIC($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "LOWER_ALPHA" && $inputValue) {
+                    else if ($rt === "LOWER_ALPHA" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Only lowercase letters is allowed";
                         if (Validate_LOWER_ALPHA($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "UPPER_ALPHA" && $inputValue) {
+                    else if ($rt === "UPPER_ALPHA" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Only uppercase letters is allowed";
                         if (Validate_UPPER_ALPHA($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "PWD" && $inputValue) {
+                    else if ($rt === "PWD" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Password Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters";
                         if (Validate_PWD($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "DIGITS" && $inputValue) {
+                    else if ($rt === "DIGITS" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "This value contains characters that are not digits";
                         if (!is_numeric($inputValue)) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "URL" && $inputValue) {
+                    else if ($rt === "URL" && $inputValue) {
                         //error message
                         $errMsg = "Please provide a valid URL that begins with http or https!";
                         if (filter_var($inputValue, FILTER_VALIDATE_URL) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "URL_QP" && $inputValue) {
+                    else if ($rt === "URL_QP" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Please provide a valid URL with a query parameter";
                         if (Validate_Url_QP($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "DATE_MDY" && $inputValue) {
+                    else if ($rt === "DATE_MDY" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Please provide a date with the format mm/dd/yyyy";
                         if (Validate_Date_MDY($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "USERNAME" && $inputValue) {
+                    else if ($rt === "USERNAME" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "Your username is invalid";
                         if (Validate_UserName($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "TEXT" && $inputValue) {
+                    else if ($rt === "TEXT" && $inputValue) {
                         //error message
                         $errMsg = (!empty($valData[1])) ? $valData[1] : "This field contains invalid characters";
                         if (Validate_TEXT($inputValue) === false) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     //ATTRIBUTES VALIDATION HERE
                     }
                     /* ATTRIBUTES VALIDATION*/
-                    else if (self::$continueValidation && $rt === "LENGTH" && $inputValue) {
+                    else if ($rt === "LENGTH" && $inputValue) {
                         //attribute value
                         $attrVal = (!empty($valData[1])) ? intval($valData[1]) : self::ovDoException("You must provide a value for the length attribute");
                         //error message
@@ -420,15 +365,11 @@ class octaValidate
                             $attrVal . ' number of characters';
 
                         if (strlen($inputValue) !== $attrVal) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "MINLENGTH" && $inputValue) {
+                    else if ($rt === "MINLENGTH" && $inputValue) {
                         //attribute value
                         $attrVal = (!empty($valData[1])) ? intval($valData[1]) : self::ovDoException("You must provide a value for the Min-length attribute");
                         //error message
@@ -436,15 +377,11 @@ class octaValidate
                             $attrVal . ' or more characters';
 
                         if (!(strlen($inputValue) >= $attrVal)) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "MAXLENGTH" && $inputValue) {
+                    else if ($rt === "MAXLENGTH" && $inputValue) {
                         //attribute value
                         $attrVal = (!empty($valData[1])) ? intval($valData[1]) : self::ovDoException("You must provide a value for the Max-length attribute");
                         //error message
@@ -452,15 +389,11 @@ class octaValidate
                             $attrVal . ' characters or less';
 
                         if (!(strlen($inputValue) <= $attrVal)) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
-                    else if (self::$continueValidation && $rt === "EQUALTO" && $inputValue) {
+                    else if ($rt === "EQUALTO" && $inputValue) {
                         //attribute value
                         $attrVal = (!empty($valData[1])) ? $valData[1] : self::ovDoException("You must provide the name of the input element whose value be compared with");
                         //error message
@@ -470,30 +403,45 @@ class octaValidate
                             self::ovDoException('The input element "' . $attrVal . '" does not exist in the POST Array');
 
                         if ($inputValue !== $_POST[$attrVal]) {
-                            self::$continueValidation = 0;
                             self::ovNewError($inputName . ":" . $attrVal, $errMsg);
-                        }
-                        else {
-                            self::$continueValidation++;
-                            self::ovRemoveError($inputName);
+                            break;
                         }
                     }
+
                 }
             }
         }
-        /*FILE VALIDATION */
-        //loop through FILE ARRAY
-        foreach ($_FILES as $inputName => $fileData) {
-            //check if current input has a validation
-            if (!empty($userValidations[$inputName])) {
-                //check if an array was provided
-                if (!is_array($userValidations[$inputName]))
-                    throw new \InvalidArgumentException("The validate method needs a valid Array to begin File validation");
-                //loop through validations
-                foreach ($userValidations[$inputName] as $valData) {
-                    //added break keyword to prevent the loop from checking the next file if current file contains errors
+        //check if errors exists then return false
+        if (count(self::$errors) !== 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function validateFiles(array $valRules = [])
+    {
+        //files array
+        $files = $_FILES;
+
+        if (!is_array($valRules) || !count($valRules))
+            throw new \InvalidArgumentException("Your validation rules must be a non-empty array");
+
+        //loop through validation rules and check if input name is in fields array
+        foreach ($valRules as $inputName => $rules) {
+            if (!isset($files[$inputName]))
+                self::ovNewError($inputName, "Fieldname $inputName cannot be found");
+        }
+        //loop though files array
+        foreach ($files as $inputName => $fileData) {
+            //check if input name needs to be validated
+            if (isset($valRules[$inputName])) {
+                //loop through validation data
+                foreach ($valRules[$inputName] as $valData) {
                     //validation rule
                     $rt = $valData[0];
+                    //file data
+                    $fileData = (!empty($files[$inputName])) ? $files[$inputName] : null;
                     //handle multiple file upload
                     if (is_array($fileData['name'])) {
                         //loop through all files
@@ -525,12 +473,6 @@ class octaValidate
                                 $currentExt = strtolower(substr($currentFileName, strrpos($currentFileName, ".")));
 
                                 //------------------
-
-                                //loop through required Extensions to check & compare
-                                // it's becoming complex & fun :( :)
-                                //preg_match('#\.{1}.#', $rext) [.png]
-                                //preg_match('#./+[^*]#', $rext) [image/jpeg]
-                                //preg_match('#.\/\*{1}#', $rext) [image/*]
 
                                 if (!in_array($currentExt, $requiredExts)) {
                                     self::ovNewMultiFileError($inputName, $errMsg);
@@ -734,6 +676,8 @@ class octaValidate
                 }
             }
         }
+
+        //check if errors exists then return false
         if (count(self::$errors) !== 0) {
             return false;
         }

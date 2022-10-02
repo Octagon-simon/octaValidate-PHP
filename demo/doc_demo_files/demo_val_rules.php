@@ -22,7 +22,7 @@ $valRules = array(
     ["EMAIL", "Your Email Address is invalid!"]
 ) );
 //begin validation
-if ($myForm->validate($valRules) === true){
+if ($myForm->validateFields($_POST, $valRules) === true){
   http_response_code(200);
   $retval= array(
       "success" => true
