@@ -2,10 +2,11 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V1.4
+ * OctaValidate Main PHP V1.6
  * author: Simon Ugorji
- * Last Edit : 26th August 2022
+ * Last Edit : 2nd October 2022
  */
+
 
 //include rules library
 require('RulesLib.php');
@@ -14,7 +15,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '1.4';
+    private static $version = '1.6';
     //author
     private static $author = 'Simon Ugorji';
     //form id
@@ -171,8 +172,16 @@ class octaValidate
             $_POST[$inp] = $val;
         }
     }
+
+    /**
+     * @deprecated
+     *
+     * @return Boolean
+     */
     public static function validate($userValidations)
     {
+        trigger_error('The Method '. __METHOD__.' is deprecated and will be removed & replaced in future versions of this library', E_USER_DEPRECATED);
+
         if (!is_array($userValidations))
             throw new \InvalidArgumentException("The validate method needs a valid Array to begin validation");
         //load custom rules
@@ -185,11 +194,19 @@ class octaValidate
         foreach ($_POST as $inputName => $inputValue) {
             //check for strict words
             if ($configOptions["strictMode"] && $configOptions["strictWords"]) {
-                $errMsg = "This value is not allowed";
                 $res = array_filter(self::$configOptions["strictWords"],
                     function ($word) use ($inputValue) {
                     return (preg_match('/(' . $word . ')/', $inputValue));
                 });
+                $errMsg = "Please replace or remove ";
+                foreach ($res as $i => $word) {
+                    if ($i !== (count($res) - 1))
+                        //add comma after the word
+                        $errMsg .= $word . ', ';
+
+                    $errMsg .= $word;
+                //example output is please remove or replace null, admin, empty
+                }
                 if (count($res) !== 0) {
                     self::$continueValidation = 0;
                     self::ovNewError($inputName, $errMsg);

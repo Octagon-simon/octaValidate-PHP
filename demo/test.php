@@ -54,18 +54,35 @@ if ($_POST) {
 }
 ?>
 <html>
-<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>octavalidate PHP Demo File</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
 
 <body>
     <form id="form_demo" method="post" novalidate>
-        <label>Username</label><br>
-        <input name="username" type="text" id="inp_uname" value="<?php ($_POST && $_POST['username']) ? print($_POST['username']) : '' ?>"> <br>
-        <label>Email</label><br>
-        <input name="email" type="email" id="inp_email" value="<?php ($_POST && $_POST['email']) ? print($_POST['email']) : '' ?>"> <br>
-        <label>Age</label><br>
-        <input name="age" type="number" id="inp_age" value="<?php ($_POST && $_POST['age']) ? print($_POST['age']) : '' ?>"> <br>
-        <label>Password</label><br>
-        <input name="password" type="password" id="inp_pass" value="<?php ($_POST && $_POST['password']) ? print($_POST['password']) : '' ?>"> <br><br>
+        <div class="form-group">
+            <label>Username</label>
+            <input name="username" type="text" id="inp_uname"
+                value="<?php ($_POST && $_POST['username']) ? print($_POST['username']) : '' ?>">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input name="email" type="email" id="inp_email"
+                value="<?php ($_POST && $_POST['email']) ? print($_POST['email']) : '' ?>">
+        </div>
+        <div class="form-group">
+            <label>Age</label>
+            <input name="age" type="number" id="inp_age"
+                value="<?php ($_POST && $_POST['age']) ? print($_POST['age']) : '' ?>">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input name="password" type="password" id="inp_pass"
+                value="<?php ($_POST && $_POST['password']) ? print($_POST['password']) : '' ?>">
+        </div>
         <button type="submit">Run Test</button>
     </form>
     <script src="../frontend/helper.js"></script>

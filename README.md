@@ -1,4 +1,4 @@
-# <img align="center" src="https://octagon-simon.github.io/assets/img/octavalidate-php.png" width="25px"> octaValidate-PHP V1.4
+# octaValidate-PHP V1.6
 
 This is a feature-rich Library that helps to validate your forms server-side using sophisticated regular expressions, PHP's inbuilt validation, and validation rules.
 
@@ -297,11 +297,11 @@ We have 3 configuration options:
 
 - stripTags: <code>Boolean</code>
   
-  Just like PHP's inbuilt `stripTags` function, this option loops through the POST Array and removes anything enclosed within a tag. Default value is `false`.
+  Just like PHP's inbuilt `stripTags` function, this option loops through the POST Array and removes anything enclosed within a tag. Default value is `true`.
 
 - strictMode: <code>Boolean</code>
   
-  This option removes extra white space from the start and at the end of a form input and also prevents the user from providing reserved keywords as values. Default value is **false**.
+  This option removes extra white space from the start and at the end of a form input and also prevents the user from providing reserved keywords as values. Default value is **true**.
 - strictWords: <code>Array</code>
   
    This option alows you to provide words that users are not supposed to submit. For eg ["null", "error", "false"]. In order to use this option, you must set **strictMode** to **true**.
@@ -332,7 +332,7 @@ After creating a new instance of the function, the methods below becomes availab
 $myForm = new octaValidate('FORM_ID');
 ```
 
-- **validate()**
+- **validate()** `deprecated`
   
   Invoke this method to begin validation
 - **getStatus()** 

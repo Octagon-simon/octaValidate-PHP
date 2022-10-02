@@ -43,13 +43,19 @@ if (isset($_POST['test'])) {
 <head>
     <meta charset="utf-8">
     <title>octavalidate PHP Demo File</title>
-
+    <link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
-    <p style="color:#000;max-width:500px">Submit a value with HTML tags, and try to provide the words <b>null, undefined, cpanel, admin, class</b> in any of your sentence. Also try to provide spaces at the start of your sentence.</p>
+    <p style="color:#000;max-width:500px">Submit a value with HTML tags, and try to provide the words <b>null,
+            undefined, cpanel, admin, class</b> in any of your sentence. Also try to provide spaces at the start of your
+        sentence.</p>
     <form id="form_demo" novalidate method="POST">
-        <label>Test</label><br>
-        <textarea id="inp_test" name="test"><?php ($_POST && $_POST['test']) ? print($_POST['test']) : '' ?></textarea><br><br>
+        <div class="form-group">
+            <label>Test</label>
+            <textarea id="inp_test"
+                name="test"><?php ($_POST && $_POST['test']) ? print($_POST['test']) : '' ?></textarea>
+        </div>
         <button type="submit">Submit</button>
     </form>
     <script src="../frontend/helper.js"></script>

@@ -42,14 +42,21 @@ if (isset($_POST['uname'])) {
 <head>
     <meta charset="utf-8">
     <title>octavalidate PHP Demo File</title>
-
+    <link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
     <form id="form_demo" novalidate method="POST" enctype="multipart/form-data">
-        <label>Username</label><br>
-        <input type="text" id="inp_uname" name="uname" value="<?php ($_POST && $_POST['uname']) ? print($_POST['uname']) : '' ?>"><br>
-        <label>First Name</label><br>
-        <input type="text" id="inp_fname" name="fname" value="<?php ($_POST && $_POST['fname']) ? print($_POST['fname']) : '' ?>"><br><br>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="inp_uname" name="uname"
+                value="<?php ($_POST && $_POST['uname']) ? print($_POST['uname']) : '' ?>">
+        </div>
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="inp_fname" name="fname"
+                value="<?php ($_POST && $_POST['fname']) ? print($_POST['fname']) : '' ?>">
+        </div>
         <button type="submit">Submit</button>
     </form>
     <script src="../frontend/helper.js"></script>

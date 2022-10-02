@@ -1,0 +1,25 @@
+button{
+    width: 300px;
+    padding: 10px;
+    background-color: #2196f3;
+    border: 2px solid #2196f3;
+    color: #fff;
+    border-radius: 5px;
+    cursor:pointer;
+}
+.form-group{
+    margin-bottom: 1.5rem;
+}
+input{
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid #e3e3e3;
+}
+
+label{
+    font-size: 1rem;
+    font-family: sans-serif;
+    margin-bottom: 10px;
+    display: block;
+}

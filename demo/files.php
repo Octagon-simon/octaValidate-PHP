@@ -43,14 +43,19 @@ if (isset($_FILES['file'])) {
 <head>
     <meta charset="utf-8">
     <title>octavalidate PHP Demo File</title>
-
+    <link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
     <form id="form_demo" novalidate method="POST" enctype="multipart/form-data">
-        <label>Single File Upload</label><br>
-        <input type="file" id="inp_sing_file" name="file"><br>
-        <label>Multiple Files Upload</label><br>
-        <input type="file" id="inp_mul_files" name="files[]" multiple><br><br>
+        <div class="form-group">
+            <label>Single File Upload</label>
+            <input type="file" id="inp_sing_file" name="file">
+        </div>
+        <div class="form-group">
+            <label>Multiple Files Upload</label>
+            <input type="file" id="inp_mul_files" name="files[]" multiple>
+        </div>
         <button type="submit">Submit</button>
     </form>
     <script src="../frontend/helper.js"></script>
