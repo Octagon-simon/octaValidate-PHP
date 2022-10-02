@@ -297,14 +297,14 @@ We have 3 configuration options:
 
 - stripTags: <code>Boolean</code>
   
-  Just like PHP's inbuilt `stripTags` function, this option loops through the POST Array and removes anything enclosed within a tag. Default value is `true`.
+  Just like PHP's inbuilt `stripTags` function, this option loops through the POST Array and removes anything enclosed within a tag. Default value is `false`.
 
 - strictMode: <code>Boolean</code>
   
-  This option removes extra white space from the start and at the end of a form input and also prevents the user from providing reserved keywords as values. Default value is **true**.
+  This option removes extra white space from the start and at the end of a form input and also prevents the user from providing reserved keywords as values. Default value is `false`.
 - strictWords: <code>Array</code>
   
-   This option alows you to provide words that users are not supposed to submit. For eg ["null", "error", "false"]. In order to use this option, you must set **strictMode** to **true**.
+   This option alows you to provide words that users are not supposed to submit. For eg ["null", "error", "false"]. In order to use this option, you must set `strictMode` to `true`.
 
 To use any of these options, provide it as an array and pass it as the second argument when creating an instance of octaValidate.
 
