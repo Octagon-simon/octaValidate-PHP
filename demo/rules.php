@@ -22,7 +22,7 @@ if (isset($_POST['uname'])) {
     );
 
     //validate form
-    if ( $validate->validateFields($_POST, $formRules) ) {
+    if ( $validate->validateFields($formRules) ) {
         echo "FORM SUBMITTED";
     }
     else {

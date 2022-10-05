@@ -39,7 +39,7 @@ $valRules = array(
 if ($_POST) {
 
     //begin validation    
-    if ($DemoForm->validateFields($_POST, $valRules) === true) {
+    if ($DemoForm->validateFields($valRules) === true) {
 
         //process form data here
         print('<script> alert("NO VALIDATION ERROR") </script>');    }

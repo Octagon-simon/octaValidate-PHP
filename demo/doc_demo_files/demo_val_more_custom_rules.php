@@ -4,7 +4,7 @@
  **/
 
 //require the library
-require 'octavalidate-php/validate.php';
+require '../validate.php';
 //set configuration
 $options = array(
     "stripTags" => true,
@@ -34,7 +34,7 @@ $valRules = array(
     )
 );
 //begin validation
-if ($myForm->validateFields($_POST, $valRules) === true) {    
+if ($myForm->validateFields($valRules) === true) {    
     //process form data here    
     http_response_code(200);    
     $retval = array(

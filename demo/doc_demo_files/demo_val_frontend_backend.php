@@ -4,7 +4,7 @@
  **/
 
 //require the library
-require 'octavalidate-php/validate.php';
+require '../validate.php';
 //set configuration
 $options = array(
     "stripTags" => true,
@@ -31,7 +31,7 @@ $valRules = array(
         ["EQUALTO", "confirm_password", "Both passwords do not match"]    
 ));
 //begin validation
-if ($myForm->validateFields($_POST, $valRules) === true) {
+if ($myForm->validateFields($valRules) === true) {
     http_response_code(200);
     $retval = array(
         "success" => true

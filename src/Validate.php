@@ -2,9 +2,9 @@
 namespace Validate;
 
 /**
- * OctaValidate Main PHP V2.0
+ * OctaValidate Main PHP V2.1
  * author: Simon Ugorji
- * Last Edit : 2nd October 2022
+ * Last Edit : 5th October 2022
  */
 
 //include rules library
@@ -14,7 +14,7 @@ class octaValidate
     //store errors
     private static $errors = [];
     //version
-    private static $version = '2.0';
+    private static $version = '2.1';
     //author
     private static $author = 'Simon Ugorji';
     //form id
@@ -62,7 +62,12 @@ class octaValidate
     {
         throw new \Exception($msg);
     }
-
+    /** 
+     * @method CustomRule 
+     * @param $ruleTitle: The title for your custom rule
+     * @param $regExp: The regular expression for this rule title
+     * @param $message: The error message to display if validation fails
+     */
     //custom rule
     public function customRule($ruleTitle = '', $regExp = '', $message = '')
     {
@@ -71,9 +76,11 @@ class octaValidate
         //store rules
         self::$customRules[$ruleTitle] = [$regExp, $message];
     }
-
-    //more custom rules
-    public function moreCustomRules($rules)
+    /** 
+     * @method moreCustomRules
+     * @param $rules: An Array containing multiple custom rules. Plese refer to the README file to view the syntax
+     */
+    public function moreCustomRules(array $rules = [])
     {
         if (!is_array($rules))
             throw new \InvalidArgumentException('To Build multiple custom rules, you need to provide an Array which will contain the "RULE TITLE, REGULAR EXPRESSION & ERROR MESSAGE". Please refer to the documentation');
@@ -151,7 +158,7 @@ class octaValidate
                 return (0);
         }
     }
-
+    //handle strict mode
     private static function doStrictMode(array $fields = [])
     {
         $configOptions = self::$configOptions;
@@ -178,11 +185,22 @@ class octaValidate
             }
         }
     }
-    public static function validateFields(array $fields = [], array $valRules = [])
+    /** 
+     * @method ValidateFields
+     * @param $valRules: An array of validation rules for the form fields.
+     * @param $fields: An array containing the form fields. It could be the `$_POST` array, `$_GET` array, `$_REQUEST` array or your custom array. Default is `$_POST` array
+     * @return Boolean
+     */
+    public static function validateFields(array $valRules = [], array $fields = [])
     {
-        if (!is_array($fields) || !count($fields))
+        if (!is_array($fields))
             //The fields to validate must be a non-empty array
-            throw new \InvalidArgumentException("Fieldlist is empty");
+            throw new \InvalidArgumentException("Fieldlist must be an array");
+
+        //check if one argument is provided
+        if(func_num_args() == 1){
+            $fields = $_POST;
+        }
 
         if (!is_array($valRules) || !count($valRules))
             throw new \InvalidArgumentException("Your validation rules must be a non-empty array");
@@ -418,7 +436,11 @@ class octaValidate
 
         return true;
     }
-
+    /** 
+     * @method ValidateFiles
+     * @param $valRules: An array of validation rules for the uploaded files.
+     * @return Boolean
+     */
     public static function validateFiles(array $valRules = [])
     {
         //files array
@@ -684,7 +706,10 @@ class octaValidate
 
         return true;
     }
-
+    /** 
+     * @method getErrors
+     * @return Array
+     */
     public static function getErrors()
     {
         $retval = array(
@@ -692,23 +717,28 @@ class octaValidate
         );
         return ($retval);
     }
-    //return error count
-    public static function getStatus()
-    {
-        return (count(self::$errors));
-    }
-
+    /** 
+     * @method getVersion
+     * @return string
+     */
     //return version number
     public static function getVersion()
     {
         return (self::$version);
     }
-
+    /** 
+     * @method getForm
+     * @return string
+     */
     //return form id
     public static function getForm()
     {
         return (self::$form);
     }
+    /** 
+     * @method getCredits
+     * @return string
+     */
     //return contributors
     public static function getCredits()
     {

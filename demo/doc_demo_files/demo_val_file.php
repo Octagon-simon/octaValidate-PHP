@@ -4,7 +4,7 @@
  **/
 
 //require the library
-require 'octavalidate-php/validate.php';
+require '../validate.php';
 //set configuration
 $options = array(
   "stripTags" => true,

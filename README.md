@@ -1,4 +1,4 @@
-# octaValidate-PHP V2.0
+# octaValidate-PHP V2.1
 
 This is a feature-rich Library that helps to validate your forms server-side using sophisticated regular expressions, PHP's inbuilt validation, and validation rules.
 
@@ -9,9 +9,9 @@ This Library also helps to validate your frontend forms using JavaScript. [Visit
 ## OTHER RELEASES
 
 ### Octavalidate - JS
-Use the JavaScript release of this library to validate your frontend forms.
+Use the JavaScript release of this library to validate your frontend (HTML) forms. 
 
-[Visit the repository](https://github.com/Octagon-simon/octaValidate-PHP)
+[Visit the repository](https://github.com/Octagon-simon/octaValidate)
 
 ### Octavalidate - NodeJS
 Use the NodeJS release of this library to validate your forms server-side. 
@@ -48,7 +48,7 @@ $myForm = new octaValidate('FORM_ID', 'CONFIG_OPTIONS');
 ## How to Use
 
 - Define validation rules for the form inputs
-- Invoke the `validateFields()` method and pass in the fields to validate as the first argument, then your validation rules as the second argument.
+- Invoke the `validateFields()` method and pass in your validation rules as the first argument, then the fields to validate as the second argument. If no fields are provided, it defaults to the `$_POST` array.
   
 ```php
 //require the library
@@ -81,7 +81,7 @@ $valRules = array(
 ) );
 
 //begin validation on $_POST fields
-if ($myForm->validateFields($_POST, $valRules) === true){
+if ($myForm->validateFields($valRules, $_POST) === true){
     //process form data here
 }else{
   //return errors
@@ -93,17 +93,17 @@ if ($myForm->validateFields($_POST, $valRules) === true){
 
 The `validateFields` method accepts 2 arguments;
 
-- The first argument is the `array` of fields to validate.
-  - This is where the form fields are coming from which can either be the `$_POST` or `$_GET` array.
+- The first argument is an array of your validation rules
 
-- The second argument is an array of your validation rules
+- The second argument is the `array` of the fields to validate.
+  - This is where the form fields are coming from which can either be the `$_POST` or `$_GET` array. If no value is provided, it defaults to the `$_POST` array.
   
    ```php
    //validate $_POST fields
-   $myForm->validateFields($_POST, $valRules);
+   $myForm->validateFields($valRules, $_POST);
 
    //validate $_GET fields
-   $myForm->validateFields($_GET, $valRules);
+   $myForm->validateFields($valRules, $_GET);
    ```
 
 This method returns a `boolean`.
@@ -111,7 +111,7 @@ This method returns a `boolean`.
 - `true` means there are no validation errors
 - `false` means there are validation errors
 
-> The `validateFields`  method does not validate uploaded files! [Please refer to the documentation](https://octagon-simon.github.io/projects/octavalidate/php/file.html) to learn more about validating uploaded files.
+> The `validateFields`  method does not validate uploaded files! Keep reading to learn how you can validate uploaded files.
 
 ## VALIDATION RULES
 
@@ -273,13 +273,14 @@ $valRules = array(
 In File validation, we have rules such as;
 
 - ACCEPT - Use this rule to list out the file extensions allowed for upload. Eg. .png, .jpeg.
-- ACCEPT-MIME - Use this rule to list out the file MIME types allowed for upload. It supports a wildcard. Eg audio/\*, image/\*, image/jpeg, image/png.
+- ACCEPT-MIME - Use this rule to list out the file MIME types allowed for upload. It supports a wildcard. Eg audio/\*, image/\*, image/jpeg, image/png. 
+> It is recommended to use `ACCEPT-MIME` rule to validate file types
 - SIZE - This rule makes sure that the size of the file or files provided must be equal to the specified value.
 - MINSIZE - This rule makes sure that the size of the file or files provided must be up to the specified value or more.
 - MAXSIZE  - This rule makes sure that the size of the file or files provided must be the specified value or less.
 - others includes; FILES, MINFILES, and MAXFILES
 
-> Note that **size, minsize & maxsize** works on both single or multiple file upload.
+> Note that **size, minsize & maxsize** works on both single or multiple files upload.
 
 For example;
 
@@ -304,23 +305,6 @@ $formRules = array(
 Please refer to the [documentation](https://octagon-simon.github.io/projects/octavalidate/php/file.html) to learn more about file validation.
 
 ## API METHODS
-
-### STATUS
-
-Invoke the **getStatus()** method to return the number of validation errors on the form.
-
-```php
-//require the library
-require 'src/Validate.php';
-
-use Validate\octaValidate;
-
-//create new instance
-$myForm = new octaValidate('my_form');
-
-//return error count
-$myForm->getStatus();
-```
 
 ## CONFIGURATION
 
@@ -363,7 +347,7 @@ After creating a new instance of the function, the methods below becomes availab
 $myForm = new octaValidate('FORM_ID');
 ```
 
-- `validateFields($fieldList, $valRules)`
+- `validateFields($valRules, $fieldList)`
   
   Invoke this method to begin validation on the form fields
 
@@ -371,18 +355,15 @@ $myForm = new octaValidate('FORM_ID');
   
   Invoke this method to begin validation on uploaded files
 
-- `getStatus()` 
-  
-  Invoke this method to see the number of validation errors on a form
 - `getForm()` 
   
-  This method returns the form ID.
-- `customRule(RULE_TITLE, REG_EXP, ERROR_TEXT)`
+  This method returns the form ID attached to the validation instance.
+- `customRule($RULE_TITLE, $REG_EXP, $ERROR_TEXT)`
   
-   Invoke this method to define your custom validation rule.
-- `moreCustomRules(RULES)`
+   Invoke this method to define your validation rule.
+- `moreCustomRules($RULES)`
   
-    Invoke this method to define more custom validation rules.
+    Invoke this method to define more validation rules.
 - `getVersion()`
   
   Invoke this method to retrieve the library's version number.
